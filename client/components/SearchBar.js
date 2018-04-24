@@ -1,24 +1,30 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Fuse from 'fuse.js'
 
 import { getProducts, setProduct } from '../store/product'
 
+import SearchResults from './SearchResults'
+import Prodcts, { Products } from './Products'
+import history from '../history'
+
 class SearchBar extends Component {
   constructor() {
     super()
     this.state = {
-      query: ''
+      query: '',
     }
   }
 
   handleInputChange = evt => {
     this.setState({
-      query: evt.target.value
+      query: evt.target.value,
     })
   }
 
-  render() {
+  handleSubmit = evt => {
+    evt.preventDefault()
     const options = {
       shouldSort: true,
       threshold: 0.6,
@@ -28,13 +34,22 @@ class SearchBar extends Component {
       minMatchCharLength: 1,
       keys: ['name', 'description']
     }
-    const { products, setProduct } = this.props
+    const { products } = this.props
     const fuse = new Fuse(products, options)
-    const result = fuse.search(this.state.query)
-    console.log('search result ', result)
+    const results = fuse.search(this.state.query)
+
+    history.push('/', { searchResults: results })
+  }
+
+  render() {
+
     return (
       <div>
-        <input placeholder="I am looking for..." onChange={this.handleInputChange} />
+        <input
+          placeholder="I'm looking for..."
+          onChange={this.handleInputChange}
+        />
+        <button onClick={this.handleSubmit}>Search</button>
       </div>
     )
   }
